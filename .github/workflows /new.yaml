@@ -1,0 +1,36 @@
+name: Docker CI Learning - KUCL
+
+on:
+  push:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up QEMU for multi-platform builds
+      - name: Set up QEMU test
+        uses: docker/setup-qemu-action@v3
+
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Log in to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Build and push Docker image
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .github/workflows  # Correct context path
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKERHUB_USER }}/kucl22:actions
